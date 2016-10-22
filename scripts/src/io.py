@@ -57,7 +57,7 @@ def video_to_array(video_path, resize=None, start_frame=0, end_frame=None,
     for i in range(start_frame, end_frame):
         ret, frame = cap.read()
         if cv2.waitKey(1) & 0xFF == ord('q') or not ret:
-            return None
+            break
 
         if resize:
             # The resize of CV2 requires pass firts width and then height
