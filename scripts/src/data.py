@@ -30,11 +30,11 @@ def to_categorical(y, nb_classes=None):
         Y[i, y[i]] = 1.
     return Y
 
-def generate_output(video_info, labels, length=16):
+def generate_output(video_info, labels, nb_frames, length=16):
     ''' Given the info of the vide, generate a vector of classes corresponding the output for each
     clip of the video which features have been extracted.
     '''
-    nb_frames = video_info['num_frames']
+    # nb_frames = video_info['num_frames']
     last_first_name = nb_frames - length + 1
 
     start_frames = range(0, last_first_name, length)
@@ -56,10 +56,13 @@ def generate_output(video_info, labels, length=16):
         output = None
 
         outs = outputs[start_frame:start_frame+length]
-        if outs.count(label) >= length / 2:
-            output = labels.index(label)
-        else:
-            output = labels[0]
+        try:
+            if outs.count(labels.index(label)) >= length / 2:
+                output = labels.index(label)
+            else:
+                output = labels.index(labels[0])
+        except UnboundLocalError:
+            output = labels.index(labels[0])
         instances.append(output)
 
     return instances

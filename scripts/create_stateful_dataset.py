@@ -38,6 +38,17 @@ def create_stateful_dataset(video_features_file, videos_info, labels, output_pat
         nb_videos = len(videos)
         print('Number of videos for {} subset: {}'.format(subset, nb_videos))
 
+        videos_new = []
+        for video_id in videos:
+            vid_features = f_video_features[video_id][...]
+            if not len(vid_features.shape) < 2:
+                videos_new.append(video_id)
+
+        videos = videos_new
+
+        nb_videos = len(videos)
+        print('Number of valid videos for {} subset: {}'.format(subset, nb_videos))
+
         # Check how the videos are going to be placed
         sequence_stack = []
         for _ in range(batch_size):
@@ -75,12 +86,16 @@ def create_stateful_dataset(video_features_file, videos_info, labels, output_pat
             for video_id in sequence_stack[i]:
                 # Video features
                 vid_features = f_video_features[video_id][...]
-                assert vid_features.shape[1] == features_size
-                nb_instances = vid_features.shape[0]
+                if len(vid_features.shape) == 1:
+                    assert vid_features.shape[0] == features_size
+                    nb_instances = 1
+                else:
+                    assert vid_features.shape[1] == features_size
+                    nb_instances = vid_features.shape[0]
 
 
                 # Output
-                output_classes = generate_output(videos_data[video_id], labels)
+                output_classes = generate_output(videos_data[video_id], labels, nb_instances * 16)
                 assert nb_instances == len(output_classes)
 
 
